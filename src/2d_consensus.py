@@ -25,18 +25,21 @@ if __name__ == "__main__":
     freq_slider = Slider(
         ax=axfreq,
         label='Step k',
-        valmin=0,  # minimun value of range
+        valmin=1,  # minimun value of range
         valmax=x.shape[0] - 1,  # maximum value of range
         valinit=steps,
         valstep=1.  # step between values
     )
 
     lines = ax.plot(x[:, :, 0], x[:, :, 1])
+    ax.scatter(x[steps - 1, :, 0], x[steps - 1, :, 1], facecolors="none", edgecolors="r", linewidths=2)
+
 
     def update(val: float):
         val = int(val)
         ax.clear()
         ax.plot(x[:val, :, 0], x[:val, :, 1])
+        ax.scatter(x[val - 1, :, 0], x[val - 1, :, 1], facecolors="none", edgecolors="r", linewidths=2)
 
     freq_slider.on_changed(update)
     plt.show()
