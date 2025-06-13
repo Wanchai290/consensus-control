@@ -14,7 +14,7 @@ def example_graph1():
     return G
 
 
-def discrete_consensus(G: nx.Graph, epsilon: float, X0: np.ndarray, steps: int):
+def discrete_consensus(G: nx.DiGraph, epsilon: float, X0: np.ndarray, steps: int):
 
     def max_in_degree(G: nx.DiGraph):
         # G.in_degree has tuple (id, in_degree)
@@ -38,7 +38,7 @@ def discrete_consensus(G: nx.Graph, epsilon: float, X0: np.ndarray, steps: int):
         last = P @ last
         x.append(last)
 
-    return x
+    return np.array(x)
 
 if __name__ == '__main__':
     G = example_graph1()
