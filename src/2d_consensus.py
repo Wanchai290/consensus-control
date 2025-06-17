@@ -34,12 +34,21 @@ if __name__ == "__main__":
     lines = ax.plot(x[:, :, 0], x[:, :, 1])
     ax.scatter(x[steps - 1, :, 0], x[steps - 1, :, 1], facecolors="none", edgecolors="r", linewidths=2)
 
+    avg = np.average(X0, axis=0)
+    ax.scatter(avg[0], avg[1])
+
+    # The difference probably comes from numerical instability
+    # or the fact that this is discrete time based
+    print(f"Expected meetup point (exact average) : {avg}")
+    print(f"Final state positions (after {steps} steps): {x[-1]}")
 
     def update(val: float):
         val = int(val)
         ax.clear()
         ax.plot(x[:val, :, 0], x[:val, :, 1])
         ax.scatter(x[val - 1, :, 0], x[val - 1, :, 1], facecolors="none", edgecolors="r", linewidths=2)
+        ax.scatter(avg[0], avg[1])
+
 
     freq_slider.on_changed(update)
     plt.show()
