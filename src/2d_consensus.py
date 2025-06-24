@@ -3,21 +3,9 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
 from discrete import example_graph1, discrete_consensus
+from continuous import continuous_consensus
 
-if __name__ == "__main__":
-    G = example_graph1()
-    epsilon = 0.1
-    X0 = np.array([
-        [-1.6, -1.1],
-        [-1.2, -1.6],
-        [-2, -2],
-        [-2.1, -3.1],
-        [-3, -1],
-        [-1, -2]
-    ])
-
-    steps = 50
-    x = discrete_consensus(G, epsilon, X0, steps)
+def display(X0, x, steps):
 
     fig, ax = plt.subplots()
     fig.set_size_inches(8, 6)
@@ -52,3 +40,24 @@ if __name__ == "__main__":
 
     freq_slider.on_changed(update)
     plt.show()
+
+if __name__ == "__main__":
+    G = example_graph1()
+    epsilon = 0.1
+    X0 = np.array([
+        [-1.6, -1.1],
+        [-1.2, -1.6],
+        [-2, -2],
+        [-2.1, -3.1],
+        [-3, -1],
+        [-1, -2]
+    ])
+
+    #steps = 50
+    #x = discrete_consensus(G, epsilon, X0, steps)
+
+    t = np.arange(0, 8, 0.01)
+    steps = len(t)
+    x = continuous_consensus(G, X0, t)
+
+    display(X0, x, steps)
