@@ -12,22 +12,30 @@ def example_graph1():
     ])
     return G
 
-G = example_graph1()
-# nx.draw(G, with_labels=True)
-# plt.show()
 
-L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
+def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray):
+    L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
 
-# Start vector for all nodes
-X0 = [5, 3, -1, 2, -6, 3]
+    def model(x, t):
+        return np.dot(-L, x)
 
-# ODE solve
-t = np.arange(0, 8, 0.0001)
+    x = odeint(model, X0, t)
+    return x
 
-def model(x, t):
-    return np.dot(-L, x)
 
-x = odeint(model, X0, t)
-plt.plot(t, x)
-plt.show()
+if __name__ == '__main__':
+    G = example_graph1()
+    # nx.draw(G, with_labels=True)
+    # plt.show()
+    
+    # Start vector for all nodes
+    X0 = [5, 3, -1, 2, -6, 3]
+
+    # ODE solve
+    t = np.arange(0, 8, 0.0001)
+
+    x = continuous_consensus(G, X0, t)
+
+    plt.plot(t, x)
+    plt.show()
 
