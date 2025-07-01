@@ -14,25 +14,36 @@ def example_graph1():
 
 
 def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray):
-    L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
+    """Wrapper to use the consensus solver for a start vector X0 of any NxN dimension"""
 
-    def model(x, t):
-        return np.dot(-L, x)
+    def consensus_solver(init_vec: np.ndarray, t: np.ndarray):
+        """
+        Solves the consensus problem for the given initial 1D vector,
+        at time steps t
+        :param init_vec: 1xN vector of initial values
+        :param t: time steps to solve for
+        """
+        L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
 
-    # don't know how to fix this copy paste
+        def model(x, t):
+            return np.dot(-L, x)
+
+        return np.array(odeint(model, init_vec, t))
+
+
     if len(X0.shape) == 1:
-        sol = np.array(odeint(model, X0, t))
+        sol = consensus_solver(X0, t)
         return sol
+    else:
+        sol = consensus_solver(X0[:, 0], t)
 
-
-    sol = np.array(odeint(model, X0[:, 0], t))
-    # required shape : [Time, NumAgents, xi]
-    sol = sol[:, :, np.newaxis]
-    for i in range(1, X0.shape[1]):
-        s = odeint(model, X0[:, i], t)
-        s = s[:, :, np.newaxis]
-        sol = np.append(sol, s, axis=2)
-    return sol
+        # required shape : [Time, NumAgents, xi]
+        sol = sol[:, :, np.newaxis]
+        for i in range(1, X0.shape[1]):
+            s = consensus_solver(X0[:, i], t)
+            s = s[:, :, np.newaxis]
+            sol = np.append(sol, s, axis=2)
+        return sol
 
 
 if __name__ == '__main__':
@@ -43,7 +54,7 @@ if __name__ == '__main__':
     # Start vector for all nodes
     X0 = np.array([5, 3, -1, 2, -6, 3])
 
-    # ODE solve
+    # Time steps to solve at
     t = np.arange(0, 8, 0.0001)
 
     x = continuous_consensus(G, X0, t)
