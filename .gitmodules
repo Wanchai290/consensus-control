@@ -1,0 +1,3 @@
+[submodule "src/ssl_traj"]
+	path = src/ssl_traj
+	url = git@github.com:Gregwar/ssl_traj.git
