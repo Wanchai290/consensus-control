@@ -3,15 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 
-def example_graph1():
-    G = nx.DiGraph()
-    G.add_nodes_from(range(1, 6))
-    G.add_edges_from([
-        (1, 4), (4, 3), (3, 2), (2, 1), (2, 4),
-        (2, 6), (6, 5), (5, 2)
-    ])
-    return G
-
+from util import example_graph1
 
 def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray):
     """Wrapper to use the consensus solver for a start vector X0 of any NxN dimension"""
