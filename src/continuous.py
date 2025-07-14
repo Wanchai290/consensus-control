@@ -5,8 +5,11 @@ from scipy.integrate import odeint
 
 from util import example_graph1, three_agents
 
-def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray):
+def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray, offsets: np.ndarray = None):
     """Wrapper to use the consensus solver for a start vector X0 of any NxN dimension"""
+
+    if offsets is not None:
+        assert offsets.shape == X0.shape, "Offsets must have same shape as start vector"
 
     def consensus_solver(init_vec: np.ndarray, t: np.ndarray):
         """
@@ -15,10 +18,14 @@ def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray):
         :param init_vec: 1xN vector of initial values
         :param t: time steps to solve for
         """
+
         L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
 
         def model(x, t):
-            return np.dot(-L, x)
+            if offsets is None:
+                return np.dot(-L, x)
+            else:
+                return np.dot(-L, x) + offsets
 
         return np.array(odeint(model, init_vec, t))
 
@@ -44,13 +51,16 @@ if __name__ == '__main__':
     # plt.show()
 
     # Start vector for all nodes
-    X0 = np.array([5, 3, -1, 2, -6, 3])
+    # X0 = np.array([5, 3, -1, 2, -6, 3])
+    X0 = np.array([4, 1, -2])
 
     # Time steps to solve at
     t = np.arange(0, 8, 0.0001)
 
-    x = continuous_consensus(G, X0, t)
+    # x = continuous_consensus(G, X0, t)
+    x = continuous_consensus(G, X0, t, offsets=np.array([-1, -1, 2]))
 
     plt.plot(t, x)
+    plt.legend((1, 2, 3))
     plt.show()
 
