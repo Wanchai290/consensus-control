@@ -23,9 +23,9 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
         D = obs.r
         return (alpha / 2.) * (np.linalg.norm(p - obs.xy) ** 2 - D ** 2)
 
-    s = np.array(obstacles[0].xy - p)
+    s = np.array([obstacles[0].xy - p])
     for i in range(1, len(obstacles)):
-        s = np.append(s, [[0, 1]] - p, axis=0)
+        s = np.append(s, [obstacles[i].xy - p], axis=0)
     G = matrix(s)
     h = matrix([
         gen_obstacle(o) for o in obstacles
@@ -40,15 +40,23 @@ if __name__ == '__main__':
     grSimController = Controller()
 
     target = np.array([1, 1])
-    obs = [
-        Obstacle(xy=np.array([[0., 0.]]), r=0.1),
-        Obstacle(xy=np.array([[0., 1.]]), r=0.1)
-    ]
+    # obs = [
+    #     Obstacle(xy=np.array([[0., 0.]]), r=0.1),
+    #     Obstacle(xy=np.array([[0., 1.]]), r=0.1)
+    # ]
     def orders(teams_data):
+        # nifty hack
+        # iterate over all robot positions, except robot blue 0
+        obs = [Obstacle(teams_data[team][i].pos, r=0.3)
+               for team in teams_data.keys()  # foreach team
+               for i in teams_data[team]   # for each robot id
+               if i != 0 or team != "blue" # but not robot blue 0
+               and teams_data[team][i] is not None]
+
         blue0 = teams_data["blue"][0]
         blue0_pos = blue0.pos
         cmd = target - blue0_pos
-        sol = zeroing_cbf(blue0_pos, cmd, alpha=4, obstacles=obs)
+        sol = zeroing_cbf(blue0_pos, cmd, alpha=9, obstacles=obs)
         print(f"Offset : {np.linalg.norm(sol['x'] - matrix(cmd)) ** 2}")
         return {"blue": {0: sol["x"]}}
 
