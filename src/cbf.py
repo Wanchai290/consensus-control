@@ -5,7 +5,7 @@ from collections import namedtuple
 Obstacle = namedtuple('Obstacle', ['xy', 'r'])
 
 def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
-                obstacles: list[Obstacle], avoid_offset: float):
+                obstacles: list[Obstacle]):
     """
     Zeroing CBF for robot at position `p` and with velocity `v_nom` originally applied.
     All obstacles will have the same `alpha` parameter applied
@@ -19,9 +19,9 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
     q = matrix(-2 * v_nom)
 
     ## Constraints
-    def gen_obstacle(o: Obstacle):
-        D = o.r + avoid_offset
-        return (alpha / 2.) * (np.linalg.norm(p - o.xy) ** 2 - D ** 2)
+    def gen_obstacle(obs: Obstacle):
+        D = obs.r
+        return (alpha / 2.) * (np.linalg.norm(p - obs.xy) ** 2 - D ** 2)
 
     s = np.array(obstacles[0].xy - p)
     for i in range(1, len(obstacles)):
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         blue0 = teams_data["blue"][0]
         blue0_pos = blue0.pos
         cmd = target - blue0_pos
-        sol = zeroing_cbf(blue0_pos, cmd, alpha=4, obstacles=obs, avoid_offset=0.05)
+        sol = zeroing_cbf(blue0_pos, cmd, alpha=4, obstacles=obs)
         print(f"Offset : {np.linalg.norm(sol['x'] - matrix(cmd)) ** 2}")
         return {"blue": {0: sol["x"]}}
 
