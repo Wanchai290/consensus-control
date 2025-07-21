@@ -34,8 +34,20 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
     return solvers.qp(P, q, G, h, options={'show_progress': False})
 
 
+def obstacles_except(teams_data, robot_id: int, robot_team: str):
+    """
+    Create obstacles to avoid all robots except `robot_id` in `robot_team`.
+    Used to control an agent robot with CBF.
+    """
+    # nifty hack
+    # iterate over all robot positions, except robot blue 0
+    return [Obstacle(teams_data[team][i].pos, r=0.3)
+           for team in teams_data.keys()  # foreach team
+           for i in teams_data[team]  # for each robot id
+           if i != robot_id or team != robot_team  # but not robot blue 0
+           and teams_data[team][i] is not None]
+
 if __name__ == '__main__':
-    print(__import__(__name__.split('.')[0]))
     from ssl_traj.main import Controller
     grSimController = Controller()
 
@@ -44,15 +56,8 @@ if __name__ == '__main__':
     #     Obstacle(xy=np.array([[0., 0.]]), r=0.1),
     #     Obstacle(xy=np.array([[0., 1.]]), r=0.1)
     # ]
-    def orders(teams_data):
-        # nifty hack
-        # iterate over all robot positions, except robot blue 0
-        obs = [Obstacle(teams_data[team][i].pos, r=0.3)
-               for team in teams_data.keys()  # foreach team
-               for i in teams_data[team]   # for each robot id
-               if i != 0 or team != "blue" # but not robot blue 0
-               and teams_data[team][i] is not None]
-
+    def order_single(teams_data):
+        obs = obstacles_except(teams_data, 0, robot_team="blue")
         blue0 = teams_data["blue"][0]
         blue0_pos = blue0.pos
         cmd = target - blue0_pos
@@ -62,5 +67,5 @@ if __name__ == '__main__':
 
     grSimController.run(
         duration=-1,
-        velocity_orders=orders
+        velocity_orders=order_single
     )
