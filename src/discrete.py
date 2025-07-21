@@ -15,7 +15,9 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
         - (Optional): Relative offsets to apply between the agents
     """
     if offsets is not None:
-        assert offsets.shape == X0.shape, "Offsets must have same shape as start vector"
+        assert offsets.shape == X0.shape, (
+            "Offsets must have same shape as start vector. "
+            f"Different shapes detected : (offsets) {offsets.shape} != {X0.shape} (X0)")
         offset_addon = lambda: offsets
     else:
         offset_addon = lambda: 0
