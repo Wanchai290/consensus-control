@@ -5,7 +5,15 @@ import matplotlib.pyplot as plt
 from util import example_graph1, three_agents
 
 
-def discrete_consensus(G: nx.DiGraph, epsilon: float, X0: np.ndarray, steps: int, offsets: np.ndarray = None):
+def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None):
+    """
+    Performs one iteration of the discrete consensus algorithm
+    Parameters:
+        - G: Graph to consider for the agents
+        - epsilon: Step size. The maximum degree (delta) times epsilon should be inferior to 1
+        - X0: Reference step
+        - (Optional): Relative offsets to apply between the agents
+    """
     if offsets is not None:
         assert offsets.shape == X0.shape, "Offsets must have same shape as start vector"
         offset_addon = lambda: offsets
@@ -25,15 +33,24 @@ def discrete_consensus(G: nx.DiGraph, epsilon: float, X0: np.ndarray, steps: int
     if not epsilon * d < 1:
         raise ValueError("epsilon * delta value superior to 1, change epsilon")
     print(f"Epsilon = {epsilon} | Max in-degree = {d}")
-    x = [X0]
 
     # Perron matrix version
     P = np.identity(L.shape[0]) - epsilon * L
+    step_x = P @ X0 + epsilon * offset_addon()
+    return np.array(step_x)
+
+def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None, steps: int = 10):
+    """
+    Simulates n steps of the discrete consensus algorithm.
+    Parameters:
+        See discrete_consensus_step() function
+        - steps: Number of steps to perform
+    """
+    x = [X0]
     last = X0
     for _ in range(steps):
-        last = P @ last + epsilon * offset_addon()
+        last = discrete_consensus_step(G, epsilon, last, offsets)
         x.append(last)
-
     return np.array(x)
 
 if __name__ == '__main__':
@@ -42,7 +59,8 @@ if __name__ == '__main__':
     # X0 = np.array([-1, 2, 6, 3, -3, 1])
     X0 = np.array([4, 1, -2])
     steps = 10
-    x = discrete_consensus(G, epsilon, X0, steps, np.array([-1, -1, 2]))
+
+    x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=np.array([-1, -1, 2]), steps=steps)
 
     # +1 for initial step
     plt.plot(range(steps + 1), x)

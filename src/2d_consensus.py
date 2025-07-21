@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
-from discrete import discrete_consensus
+from discrete import discrete_consensus_sim_complete
 from continuous import continuous_consensus
 from util import example_graph1
 
@@ -54,11 +54,11 @@ if __name__ == "__main__":
         [-1, -2]
     ])
 
-    #steps = 50
-    #x = discrete_consensus(G, epsilon, X0, steps)
+    steps = 50
+    x = discrete_consensus_sim_complete(G, epsilon, X0, steps=steps)
 
-    t = np.arange(0, 8, 0.01)
-    steps = len(t)
-    x = continuous_consensus(G, X0, t)
+    # t = np.arange(0, 8, 0.01)
+    # steps = len(t)
+    # x = continuous_consensus(G, X0, t)
 
     display(X0, x, steps)
