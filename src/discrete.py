@@ -60,7 +60,14 @@ if __name__ == '__main__':
     X0 = np.array([4, 1, -2])
     steps = 10
 
-    x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=np.array([-1, -1, 2]), steps=steps)
+    # Reference point : agent 1 -> coordinate (0) (it's the new basis in some way)
+    # Offsets explanation:
+    # - Agent 0: -1 (from 0 to 1)
+    # - Agent 1: -1 (from 1 to 2)
+    # - Agent 2: 2 (from 2 to 0)
+    offsets = np.array([-1, -1, 2])
+
+    x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=offsets, steps=steps)
 
     # +1 for initial step
     plt.plot(range(steps + 1), x)
