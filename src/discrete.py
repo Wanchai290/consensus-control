@@ -2,17 +2,37 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util import example_graph1, three_agents
+from util import example_graph1, three_agents, max_in_degree
 
+
+def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None):
+    """
+    Similar to discrete_consensus_step(), except it returns the control function to apply instead to the states
+    Pre-requisites:
+        The value of node i in graph G should be X0[i] (i.e. start node ordering at 0).
+        Same for offsets array.
+    Args: See discrete_consensus_step()
+    Returns:
+        Control function of shape X0 to apply to all agents (
+    """
+    u_k = np.zeros(X0.shape)
+    for node in G.nodes():
+        s = 0
+        for neighbour in G.neighbors(node):
+            s += X0[neighbour] - X0[node] + offsets[node]
+        u_k[node] = epsilon * s
+    return u_k
 
 def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None):
     """
-    Performs one iteration of the discrete consensus algorithm
+    Performs one iteration of the discrete consensus algorithm.
     Parameters:
         - G: Graph to consider for the agents
         - epsilon: Step size. The maximum degree (delta) times epsilon should be inferior to 1
         - X0: Reference step
         - (Optional): Relative offsets to apply between the agents
+    Returns:
+        The next state vector x[k+1] of all agents i.
     """
     if offsets is not None:
         assert offsets.shape == X0.shape, (
@@ -22,11 +42,6 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
     else:
         offset_addon = lambda: 0
 
-    def max_in_degree(G: nx.DiGraph):
-        # G.in_degree has tuple (id, in_degree)
-        # retrieve maximum in_degree value at index 1
-        return max(G.in_degree, key=lambda s: s[1])[1]
-
     # we want in-degree Laplacian matrix. docs say to use G.reverse() to get it
     L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
 
@@ -34,10 +49,11 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
     d = max_in_degree(G)
     if not epsilon * d < 1:
         raise ValueError("epsilon * delta value superior to 1, change epsilon")
-    print(f"Epsilon = {epsilon} | Max in-degree = {d}")
+    # print(f"Epsilon = {epsilon} | Max in-degree = {d}")
 
     # Perron matrix version
     P = np.identity(L.shape[0]) - epsilon * L
+
     step_x = P @ X0 + epsilon * offset_addon()
     return np.array(step_x)
 
@@ -51,8 +67,13 @@ def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarra
     x = [X0]
     last = X0
     for _ in range(steps):
-        last = discrete_consensus_step(G, epsilon, last, offsets)
-        x.append(last)
+        # Perron matrix version
+        # last = discrete_consensus_step(G, epsilon, last, offsets)
+
+        # Control function version
+        ctrl = discrete_consensus_cfunc(G, epsilon, last, offsets)
+        x.append(last + ctrl)
+        last = x[-1]
     return np.array(x)
 
 if __name__ == '__main__':

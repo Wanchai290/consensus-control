@@ -17,3 +17,8 @@ def three_agents():
         (0, 1), (1, 2), (2, 0)
     ])
     return G
+
+def max_in_degree(G: nx.DiGraph):
+    # G.in_degree has tuple (id, in_degree)
+    # retrieve maximum in_degree value at index 1
+    return max(G.in_degree, key=lambda s: s[1])[1]
