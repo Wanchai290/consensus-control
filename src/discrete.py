@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 from util import example_graph1, three_agents, max_in_degree
 
 
-def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None):
+def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None,
+                             common_drift: np.ndarray = np.array(0.)):
     """
     Similar to discrete_consensus_step(), except it returns the control function to apply instead to the states
     Pre-requisites:
         The value of node i in graph G should be X0[i] (i.e. start node ordering at 0).
         Same for offsets array.
     Args: See discrete_consensus_step()
+        common_drift: Used to move all agents in a certain direction
     Returns:
         Control function of shape X0 to apply to all agents (
     """
@@ -19,8 +21,10 @@ def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offs
     for node in G.nodes():
         s = 0
         for neighbour in G.neighbors(node):
-            s += X0[neighbour] - X0[node] + offsets[node]
-        u_k[node] = epsilon * s
+            s += X0[neighbour] - X0[node]
+            if offsets is not None:
+                s += offsets[node]
+        u_k[node] = epsilon * (s + common_drift)
     return u_k
 
 def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None):
