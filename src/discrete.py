@@ -54,8 +54,8 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
     # Perron matrix version
     P = np.identity(L.shape[0]) - epsilon * L
 
-    step_x = P @ X0 + epsilon * offset_addon()
-    return np.array(step_x)
+    x_next = P @ X0 + epsilon * offset_addon()
+    return np.array(x_next)
 
 def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None, steps: int = 10):
     """
@@ -68,12 +68,13 @@ def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarra
     last = X0
     for _ in range(steps):
         # Perron matrix version
-        # last = discrete_consensus_step(G, epsilon, last, offsets)
+        last = discrete_consensus_step(G, epsilon, last, offsets)
+        x.append(last)
 
         # Control function version
-        ctrl = discrete_consensus_cfunc(G, epsilon, last, offsets)
-        x.append(last + ctrl)
-        last = x[-1]
+        # ctrl = discrete_consensus_cfunc(G, epsilon, last, offsets)
+        # x.append(last + ctrl)
+        # last = x[-1]
     return np.array(x)
 
 if __name__ == '__main__':
