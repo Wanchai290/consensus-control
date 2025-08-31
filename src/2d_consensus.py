@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
-from discrete import discrete_consensus_sim_complete
-from continuous import continuous_consensus
-from util import example_graph1
+from src.discrete import discrete_consensus_sim_complete
+from src.continuous import continuous_consensus
+from src.util import example_graph1
 
 def display(X0, x, steps):
 

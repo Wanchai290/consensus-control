@@ -5,8 +5,8 @@ import numpy as np
 from pynput import keyboard
 from threading import Lock
 
-from cbf import obstacles_except, zeroing_cbf
-from discrete import discrete_consensus_step, discrete_consensus_cfunc
+from src.cbf import obstacles_except, zeroing_cbf
+from src.discrete import discrete_consensus_step, discrete_consensus_cfunc
 
 if __name__ == '__main__':
     """

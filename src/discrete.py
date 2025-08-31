@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util import example_graph1, three_agents, max_in_degree
+from src.util import example_graph1, three_agents, max_in_degree
 
 
 def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None,

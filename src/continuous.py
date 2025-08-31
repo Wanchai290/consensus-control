@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 
-from util import example_graph1, three_agents
+from src.util import example_graph1, three_agents
 
 def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray, offsets: np.ndarray = None):
     """Wrapper to use the consensus solver for a start vector X0 of any NxN dimension"""
