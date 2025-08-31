@@ -5,7 +5,7 @@ from collections import namedtuple
 Obstacle = namedtuple('Obstacle', ['xy', 'r'])
 
 def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
-                obstacles: list[Obstacle]):
+                obstacles):
     """
     Zeroing CBF for robot at position `p` and with velocity `v_nom` originally applied.
     All obstacles will have the same `alpha` parameter applied
