@@ -19,7 +19,7 @@ def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray, offsets: 
         :param t: time steps to solve for
         """
 
-        L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
+        L = nx.laplacian_matrix(G).toarray()
 
         def model(x, t):
             if offsets is None:

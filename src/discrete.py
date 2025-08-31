@@ -46,8 +46,7 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
     else:
         offset_addon = lambda: 0
 
-    # we want in-degree Laplacian matrix. docs say to use G.reverse() to get it
-    L = nx.laplacian_matrix(G.reverse(copy=False)).toarray()
+    L = nx.laplacian_matrix(G).toarray()
 
     # Discrete-time version
     d = max_in_degree(G)
