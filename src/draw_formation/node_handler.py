@@ -10,7 +10,7 @@ class Node:
         self.is_moving = False
         """Whether the node is currently being moved by the user"""
 
-nodes: dict[int, Node] = {}
+nodes = {} # dict[int, Node]
 """Associates an integer to a node"""
 
 def create_node():

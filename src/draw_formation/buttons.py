@@ -42,7 +42,7 @@ def in_box_generator(draw_box) -> typing.Callable[[float, float], bool]:
 WORLD_MAX_X = 4.5
 WORLD_MAX_Y = 3.
 
-def convert_pygame_to_world(pg_coords: tuple[float, float]) -> tuple[float, float]:
+def convert_pygame_to_world(pg_coords):
     """
     Ratio converter that translates screen coordinates to the coordinates
     used in the Ibuki laboratory's experiment zone.
