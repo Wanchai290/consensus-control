@@ -14,8 +14,14 @@ def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offs
         Same for offsets array.
     Args: See discrete_consensus_step()
         common_drift: Used to move all agents in a certain direction
+
     Returns:
-        Control function of shape X0 to apply to all agents (
+        Control function `u` of shape X0 to apply to all agents.
+
+        If you have current state x_k, the return value of this function
+        can be used as such :
+
+        `x_k_next = x_k + discrete_consensus_cfunc(...)`
     """
     u_k = np.zeros(X0.shape)
     for node in G.nodes():
@@ -63,6 +69,10 @@ def discrete_consensus_step(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offse
 def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offsets: np.ndarray = None, steps: int = 10):
     """
     Simulates n steps of the discrete consensus algorithm.
+    You can modify the code to either use the Perron matrix version,
+    or the version that returns the control function u_k to apply to all agents
+    (such that `x_k_next = x_k + u_k`)
+
     Parameters:
         See discrete_consensus_step() function
         - steps: Number of steps to perform
@@ -70,33 +80,38 @@ def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarra
     x = [X0]
     last = X0
     for _ in range(steps):
-        # Perron matrix version
-        last = discrete_consensus_step(G, epsilon, last, offsets)
-        x.append(last)
+        # -- Perron matrix version
+        # last = discrete_consensus_step(G, epsilon, last, offsets)
+        # x.append(last)
 
-        # Control function version
-        # ctrl = discrete_consensus_cfunc(G, epsilon, last, offsets)
-        # x.append(last + ctrl)
-        # last = x[-1]
+        # -- Control function version
+        ctrl = discrete_consensus_cfunc(G, epsilon, last, offsets)
+        x.append(last + ctrl)
+        last = x[-1]
     return np.array(x)
 
 if __name__ == '__main__':
     G = three_agents()
-    epsilon = 0.4
+    epsilon = 0.35
     # X0 = np.array([-1, 2, 6, 3, -3, 1])
     X0 = np.array([4, 1, -2])
     steps = 10
 
-    # Reference point : agent 1 -> coordinate (0) (it's the new basis in some way)
     # Offsets explanation:
     # - Agent 0: 1 (direct vector from 0 to 1, in the Cartesian coordinate space)
     # - Agent 1: 1 (from agent 1 to agent 2)
     # - Agent 2: -2 (from agent 2 to agent 0)
-    offsets = np.array([1, 1, -2])
+    offsets = np.array([1.2, 1.2, -2.4])
 
     x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=offsets, steps=steps)
 
-    # +1 for initial step
-    plt.plot(range(steps + 1), x)
-    plt.grid()
+    plt.figure(figsize=(8, 4))
+
+    plt.plot(range(steps + 1), x)  # +1 for initial step
+    plt.title(f"Discrete-time consensus with offsets applied, epsilon = {epsilon}")
+    plt.xlabel("Steps")
+    plt.ylabel("Agent value")
+
+    plt.legend([f'Agent {i+1}' for i in range(3)])
+    # plt.grid()
     plt.show()
