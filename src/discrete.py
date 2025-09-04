@@ -23,7 +23,7 @@ def discrete_consensus_cfunc(G: nx.DiGraph, epsilon: float, X0: np.ndarray, offs
         for neighbour in G.neighbors(node):
             s += X0[neighbour] - X0[node]
             if offsets is not None:
-                s += offsets[node]
+                s -= offsets[node]
         u_k[node] = epsilon * (s + common_drift)
     return u_k
 
@@ -89,10 +89,10 @@ if __name__ == '__main__':
 
     # Reference point : agent 1 -> coordinate (0) (it's the new basis in some way)
     # Offsets explanation:
-    # - Agent 0: -1 (from 0 to 1)
-    # - Agent 1: -1 (from 1 to 2)
-    # - Agent 2: 2 (from 2 to 0)
-    offsets = np.array([-1, -1, 2])
+    # - Agent 0: 1 (direct vector from 0 to 1, in the Cartesian coordinate space)
+    # - Agent 1: 1 (from agent 1 to agent 2)
+    # - Agent 2: -2 (from agent 2 to agent 0)
+    offsets = np.array([1, 1, -2])
 
     x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=offsets, steps=steps)
 

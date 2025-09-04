@@ -25,7 +25,7 @@ def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray, offsets: 
             if offsets is None:
                 return np.dot(-L, x)
             else:
-                return np.dot(-L, x) + offsets
+                return np.dot(-L, x) - offsets
 
         return np.array(odeint(model, init_vec, t))
 
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     t = np.arange(0, 8, 0.0001)
 
     # x = continuous_consensus(G, X0, t)
-    x = continuous_consensus(G, X0, t, offsets=np.array([-1, -1, 2]))
+    x = continuous_consensus(G, X0, t, offsets=np.array([1, 1, -2]))
 
     plt.plot(t, x)
     plt.legend((1, 2, 3))
