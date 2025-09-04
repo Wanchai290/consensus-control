@@ -1,4 +1,4 @@
-from log import logger
+from src.draw_formation.log import logger
 
 # -- Node creation and handling
 class Node:

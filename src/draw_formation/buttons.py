@@ -1,13 +1,67 @@
+import threading
 import typing
+
+import numpy as np
 import pygame
 
 import node_handler
 from drawing_formation import SCREEN_SIZE
 BUTTONS_Y_TOP = 650.
 
+def offsets_access():
+    """Ensures thread-safe access to the computed offsets variable,
+    so that a developer might not try to access it directly."""
+
+    calculated_offsets: list[tuple[int, int]] = []
+    """Offsets computed for the current drawing"""
+    co_lock = threading.Lock()
+
+    def setter(new):
+        nonlocal calculated_offsets
+        co_lock.acquire()
+        calculated_offsets = new
+        co_lock.release()
+        print(new)
+
+    def getter():
+        nonlocal calculated_offsets
+        co_lock.acquire()
+        val = calculated_offsets
+        co_lock.release()
+        return val
+
+    return getter, setter
+
+get_offsets, set_offsets = offsets_access()
+
+
 def in_box_generator(draw_box) -> typing.Callable[[float, float], bool]:
     return lambda x,y: (draw_box[0] <= x <= draw_box[0] + draw_box[2]
                         and draw_box[1] <= y <= draw_box[1] + draw_box[3])
+
+WORLD_MAX_X = 4.5
+WORLD_MAX_Y = 3.
+
+def convert_pygame_to_world(pg_coords: tuple[float, float]) -> tuple[float, float]:
+    """
+    Ratio converter that translates screen coordinates to the coordinates
+    used in the Ibuki laboratory's experiment zone.
+
+    Screen coordinates start from the top-left, then go down and to the right.
+    Ibuki laboratory's zone start from the center, then go up and to the right.
+
+    The origin difference is transformed by applying an offset of the screen's size divided by 2.
+    Difference in direction is transformed by just flipping the sign.
+
+    No need to flip y coordinate because distance vectors are relative.
+    """
+    x, y = pg_coords
+    x = x - SCREEN_SIZE[0] / 2.  # offset to allow negative coordinates
+    x = x * (WORLD_MAX_X / SCREEN_SIZE[0])  # ratio down coordinate
+
+    y = y - SCREEN_SIZE[1] / 2.
+    y = y * (WORLD_MAX_Y / SCREEN_SIZE[1])
+    return x, y
 
 CLEAR_BUTTON_CDS = (
     10,
@@ -41,7 +95,20 @@ def click(event: pygame.event.Event):
         node_handler.nodes.clear()
     elif update_button_clicked(*mouse_pos):
         # upload to some library
-        pass
+        # retrieve node coordinates & convert them to world frame
+        num_nodes = len(node_handler.nodes)
+        node_poses = [0] * num_nodes
+        for nid in node_handler.nodes.keys():
+            node_poses[nid] = np.array(convert_pygame_to_world(node_handler.get_node(nid).coords))
+
+        # compute offsets
+        offsets = [0] * num_nodes
+        for nid in node_handler.nodes.keys():
+            for neigh_id in node_handler.get_node(nid).neighbours:
+                offsets[nid] += node_poses[neigh_id] - node_poses[nid]
+        set_offsets(offsets)
+
+
     elif remove_links_button_clicked(*mouse_pos):
         for i in range(len(node_handler.nodes)):
             node_handler.nodes[i].neighbours.clear()

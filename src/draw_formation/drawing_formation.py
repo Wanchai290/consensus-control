@@ -1,30 +1,7 @@
 SCREEN_SIZE = (1280, 720)
-WORLD_MAX_X = 4.5
-WORLD_MAX_Y = 3.
-
-def convert_pygame_to_world(pg_coords: tuple[float, float]) -> tuple[float, float]:
-    """
-    Ratio converter that translates screen coordinates to the coordinates
-    used in the Ibuki laboratory's experiment zone.
-
-    Screen coordinates start from the top-left, then go down and to the right.
-    Ibuki laboratory's zone start from the center, then go up and to the right.
-
-    The origin difference is transformed by applying an offset of the screen's size divided by 2.
-    Difference in direction is transformed by just flipping the sign.
-
-    No need to flip y coordinate because distance vectors are relative.
-    """
-    x, y = pg_coords
-    x = x - SCREEN_SIZE[0] / 2.  # offset to allow negative coordinates
-    x = x * (WORLD_MAX_X / SCREEN_SIZE[0])  # ratio down coordinate
-
-    y = y - SCREEN_SIZE[1] / 2.
-    y = y * (WORLD_MAX_Y / SCREEN_SIZE[1])
-    return x, y
 
 
-if __name__ == '__main__':
+def main(default_offsets: tuple = None):
     # Example file showing a basic pygame "game loop"
     import pygame
     import numpy as np
@@ -33,7 +10,9 @@ if __name__ == '__main__':
     import node_mover
     import linker
     import buttons
+    buttons.set_offsets(default_offsets)
 
+    pygame.display.set_caption("Formation drawing app (Tatusya Ibuki laboratory)")
     if not pygame.font:
         print("Warning: pygame.font module not loaded. Text rendering will surely crash the program.")
 
@@ -78,7 +57,6 @@ if __name__ == '__main__':
         elif event.type == pygame.MOUSEBUTTONUP:
             # only handling left click released
             node_mover.stop_moving(pygame.mouse.get_pos())
-            print(pygame.mouse.get_pos())
 
 
     while running:
@@ -93,20 +71,6 @@ if __name__ == '__main__':
                     buttons.click(event)
                 else:
                     drawing_area_click(event)
-
-            elif event.type == pygame.KEYDOWN:
-                # retrieve node coordinates & convert them to world frame
-                num_nodes = len(node_handler.nodes)
-                node_poses = [0] * num_nodes
-                for nid in node_handler.nodes.keys():
-                    node_poses[nid] = np.array(convert_pygame_to_world(node_handler.get_node(nid).coords))
-
-                # compute offsets
-                offsets = [0] * num_nodes
-                for nid in node_handler.nodes.keys():
-                    for neigh_id in node_handler.get_node(nid).neighbours:
-                        offsets[nid] += node_poses[neigh_id] - node_poses[nid]
-                print(offsets)
 
         # -- Rendering
         # fill the screen with a color to wipe away anything from last frame
@@ -142,3 +106,6 @@ if __name__ == '__main__':
         clock.tick(60)  # limits FPS to 60
 
     pygame.quit()
+
+if __name__ == '__main__':
+    main()
