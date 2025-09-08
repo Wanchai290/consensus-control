@@ -1,5 +1,7 @@
-SCREEN_SIZE = (1280, 720)
+import threading
 
+SCREEN_SIZE = (1280, 720)
+END_EVENT = threading.Event()
 
 def main(default_offsets: tuple = None):
     # Example file showing a basic pygame "game loop"
@@ -59,7 +61,7 @@ def main(default_offsets: tuple = None):
             node_mover.stop_moving(pygame.mouse.get_pos())
 
 
-    while running:
+    while running and not END_EVENT.is_set():
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
@@ -105,6 +107,7 @@ def main(default_offsets: tuple = None):
 
         clock.tick(60)  # limits FPS to 60
 
+    END_EVENT.set()
     pygame.quit()
 
 if __name__ == '__main__':
