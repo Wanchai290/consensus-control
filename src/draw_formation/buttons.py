@@ -5,7 +5,7 @@ import numpy as np
 import pygame
 
 from src.draw_formation import node_handler
-from src.draw_formation.drawing_formation import SCREEN_SIZE
+from src.draw_formation.drawer import SCREEN_SIZE
 BUTTONS_Y_TOP = 650.
 
 def offsets_access():

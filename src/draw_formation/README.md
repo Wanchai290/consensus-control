@@ -16,7 +16,7 @@ If you perform the same steps to link node A to node B, the link will be removed
 The application does not support multiple links to the same node.
 
 ## Development
-The main module is called `drawing_formation.py` and is where the pygame window is created.
+The main module is called `drawer.py` and is where the pygame window is created.
 It handles mouse & keyboard events, and the logic to interact with the screen
 
 In general, the application is designed to be manipulated with the control functions provided
@@ -45,5 +45,5 @@ by saving the latest node middle-clicked by the user. If this node is not None, 
 Draws buttons on the screen & contains the code to execute when a button is clicked
 
 
-- `drawing_formation`\
+- `drawer`\
 Essentially the main file, starts display of the screen, uses all modules and handles the pygame window.
