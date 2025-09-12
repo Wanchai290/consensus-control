@@ -24,18 +24,26 @@ by each module. Do not attempt to re-create behaviour provided by these function
 trying to link two nodes without calling `node_handler.link()`) 
 
 ### Modules
-- `node_handler`
+- `node_handler`\
 Handles creation, deletion, and linking of nodes. To access all available nodes,
 access the field `node_handler.nodes`.
 
 
-- `node_mover`
+- `node_mover`\
 When the user left-clicks on an existing node, this module saves the node selected and
 updates the node's `is_moving` field accordingly. Once the user releases the left-click button,
 the saved node's position is set to the current mouse position.
 
 
-- `linker`
+- `linker`\
 Handles the mouse wheel click event. This module's functions are called when trying to link a node to another,
 by saving the latest node middle-clicked by the user. If this node is not None, a link will be created
 (or deleted, if a link was already present).
+
+
+- `buttons`\
+Draws buttons on the screen & contains the code to execute when a button is clicked
+
+
+- `drawing_formation`\
+Essentially the main file, starts display of the screen, uses all modules and handles the pygame window.
