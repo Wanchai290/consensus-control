@@ -8,10 +8,7 @@ def main(default_offsets: tuple = None):
     import pygame
     import numpy as np
 
-    from src.draw_formation import node_handler
-    from src.draw_formation import node_mover
-    from src.draw_formation import linker
-    from src.draw_formation import buttons
+    from src.draw_formation import node_handler, node_mover, linker, buttons
     buttons.set_offsets(default_offsets)
 
     pygame.display.set_caption("Formation drawing app (Tatusya Ibuki laboratory)")
