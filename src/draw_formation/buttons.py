@@ -102,7 +102,7 @@ def click(event: pygame.event.Event):
             node_poses[nid] = np.array(convert_pygame_to_world(node_handler.get_node(nid).coords))
 
         # compute offsets
-        offsets = [0] * num_nodes
+        offsets = [np.zeros(2)] * num_nodes
         for nid in node_handler.nodes.keys():
             for neigh_id in node_handler.get_node(nid).neighbours:
                 offsets[nid] += node_poses[neigh_id] - node_poses[nid]
