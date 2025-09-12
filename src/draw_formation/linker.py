@@ -1,5 +1,5 @@
 from src.draw_formation import node_handler
-from log import logger
+from src.draw_formation.log import logger
 
 _saved = None
 
