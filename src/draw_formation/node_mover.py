@@ -1,4 +1,4 @@
-from node_handler import Node
+from src.draw_formation.node_handler import Node
 
 _moving = None
 

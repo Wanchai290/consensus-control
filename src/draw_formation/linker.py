@@ -1,4 +1,4 @@
-import node_handler
+from src.draw_formation import node_handler
 from log import logger
 
 _saved = None
