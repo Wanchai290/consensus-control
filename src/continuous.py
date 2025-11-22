@@ -6,7 +6,14 @@ from scipy.integrate import odeint
 from src.util import example_graph1, three_agents
 
 def continuous_consensus(G: nx.DiGraph, X0: np.ndarray, t: np.ndarray, offsets: np.ndarray = None):
-    """Wrapper to use the consensus solver for a start vector X0 of any NxN dimension"""
+    """
+    Wrapper to use the consensus solver for a start vector X0 of any NxN dimension
+    Parameters:
+        - G: networkx DiGraph describing the N agents
+        - X0: initial values vector
+        - t: Sequence of time steps to solve at
+        - (optional) offsets: Array of N offsets between agents
+    """
 
     if offsets is not None:
         assert offsets.shape == X0.shape, "Offsets must have same shape as start vector"
@@ -61,6 +68,9 @@ if __name__ == '__main__':
     x = continuous_consensus(G, X0, t, offsets=np.array([1, 1, -2]))
 
     plt.plot(t, x)
+    plt.title("Continuous-time consensus with offsets")
+    plt.xlabel("Time t")
+    plt.ylabel("Agent value")
     plt.legend((1, 2, 3))
     plt.show()
 

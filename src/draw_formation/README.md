@@ -12,7 +12,7 @@
 
 Note: arcs created are directed (one-way only)
 
-If you perform the same steps to link node A to node B, the link will be removed.
+If you perform the same steps to create a link from node A to node B, the link will be removed.
 The application does not support multiple links to the same node.
 
 ## Development

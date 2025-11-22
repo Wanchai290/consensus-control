@@ -5,7 +5,7 @@ import numpy as np
 from pynput import keyboard
 from threading import Lock
 
-from src.cbf import obstacles_except, zeroing_cbf
+from src.cbf import grSim_obstacles_except, zeroing_cbf
 from src.discrete import discrete_consensus_step, discrete_consensus_cfunc
 
 if __name__ == '__main__':
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     """
     from ssl_traj.main import Controller
     G = nx.DiGraph()
-    G.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 0)])
+    G.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 0)]) # connected graph
 
     # Reference: agent 0
     square = np.array([
@@ -42,6 +42,7 @@ if __name__ == '__main__':
 
         def on_press(key):
             nonlocal drift, w_lock
+            print(key)
             d = np.zeros(2)
             try:
                 if key.char == 'z':
@@ -98,7 +99,7 @@ if __name__ == '__main__':
         target_speeds = discrete_consensus_cfunc(G, epsilon=0.95, X0=agent_positions, offsets=square, common_drift=drift_value)
 
         # Define the list of obstacles as being all other robots, except itself
-        agent_obstacles = [obstacles_except(teams_data, rob_id, "blue") for rob_id in agents]
+        agent_obstacles = [grSim_obstacles_except(teams_data, rob_id, "blue") for rob_id in agents]
 
         # Solve QP to get adapted speeds for each robot
         solutions = [zeroing_cbf(agent_positions[rob_id], target_speeds[rob_id], 0.3, agent_obstacles[rob_id])

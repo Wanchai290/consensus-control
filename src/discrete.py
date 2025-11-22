@@ -92,10 +92,10 @@ def discrete_consensus_sim_complete(G: nx.DiGraph, epsilon: float, X0: np.ndarra
 
 if __name__ == '__main__':
     G = three_agents()
-    epsilon = 0.35
+    epsilon = 0.4
     # X0 = np.array([-1, 2, 6, 3, -3, 1])
     X0 = np.array([4, 1, -2])
-    steps = 10
+    steps = 12
 
     # Offsets explanation:
     # - Agent 0: 1 (direct vector from 0 to 1, in the Cartesian coordinate space)
@@ -105,13 +105,14 @@ if __name__ == '__main__':
 
     x = discrete_consensus_sim_complete(G, epsilon, X0, offsets=offsets, steps=steps)
 
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(6, 5))
 
     plt.plot(range(steps + 1), x)  # +1 for initial step
     plt.title(f"Discrete-time consensus with offsets applied, epsilon = {epsilon}")
     plt.xlabel("Steps")
     plt.ylabel("Agent value")
-
-    plt.legend([f'Agent {i+1}' for i in range(3)])
+    
+    l = ["Alice", "Bob", "Charlie"]
+    plt.legend([f'Agent {l[i]}' for i in range(3)])
     # plt.grid()
     plt.show()

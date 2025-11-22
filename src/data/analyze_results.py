@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 
 def achievement_progress_plot():
-    data = np.load("line/achievement.npy")  # shape : (n steps, m , 1)
+    data = np.load("line/achievement.npy")  # shape : (n: steps, m: L2 norm to formation offset, 1)
     # data = np.array([
     #     [0.3, 6, 2],
     #     [1.2, 3, 1],

@@ -8,7 +8,14 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
                 obstacles):
     """
     Zeroing CBF for robot at position `p` and with velocity `v_nom` originally applied.
-    All obstacles will have the same `alpha` parameter applied
+
+    The ZCBF used is h(x) = 1/2 (||x - o||² - D²) where `D` is the distance to respect to the obstacle
+    and `o` is the position of the obstacle (as defined in function gen_obstacles()).
+    Solving had to be adapted due to the nature of the solver of cvxopt,
+    so the constraints `h'(x) + αh(x)` had to be adapted into a generic form equation
+    (see https://cvxopt.org/userguide/coneprog.html#quadratic-programming)
+
+    All obstacles will have the same `alpha` parameter applied.
     """
     if alpha <= 0.:
         raise ValueError("alpha must be > 0.")
@@ -20,6 +27,7 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
 
     ## Constraints
     def gen_obstacle(obs: Obstacle):
+        """Create an obstacle using the h(x) function explained above"""
         D = obs.r
         return (alpha / 2.) * (np.linalg.norm(p - obs.xy) ** 2 - D ** 2)
 
@@ -34,7 +42,7 @@ def zeroing_cbf(p: np.ndarray, v_nom: np.ndarray, alpha: float,
     return solvers.qp(P, q, G, h, options={'show_progress': False})
 
 
-def obstacles_except(teams_data, robot_id: int, robot_team: str):
+def grSim_obstacles_except(teams_data, robot_id: int, robot_team: str):
     """
     Create obstacles to avoid all robots except `robot_id` in `robot_team`.
     Used to control an agent robot with CBF.
@@ -48,16 +56,23 @@ def obstacles_except(teams_data, robot_id: int, robot_team: str):
            and teams_data[team][i] is not None]
 
 if __name__ == '__main__':
+    """
+    Runs the ZCBF-QP minimization problem to avoid obstacles, in the grSim simulator.
+    Commands the blue robot 0 with ID 0, moving it to the center of the field.
+    Refer to the documentation of grSim to learn how to move the robot in the simulator using the mouse.
+    """
     from ssl_traj.main import Controller
     grSimController = Controller()
 
-    target = np.array([1, 1])
+    target = np.array([0, 0])  # Target location for robot 0
+
+    # Example of a fixed list of obstacles
     # obs = [
     #     Obstacle(xy=np.array([[0., 0.]]), r=0.1),
     #     Obstacle(xy=np.array([[0., 1.]]), r=0.1)
     # ]
     def order_single(teams_data):
-        obs = obstacles_except(teams_data, 0, robot_team="blue")
+        obs = grSim_obstacles_except(teams_data, 0, robot_team="blue")
         blue0 = teams_data["blue"][0]
         blue0_pos = blue0.pos
         cmd = target - blue0_pos
