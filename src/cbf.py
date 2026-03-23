@@ -64,7 +64,7 @@ if __name__ == '__main__':
     from ssl_traj.main import Controller
     grSimController = Controller()
 
-    target = np.array([0, 0])  # Target location for robot 0
+    target = np.array([0., 0.])  # Target location for robot 0
 
     # Example of a fixed list of obstacles
     # obs = [
@@ -73,11 +73,15 @@ if __name__ == '__main__':
     # ]
     def order_single(teams_data):
         obs = grSim_obstacles_except(teams_data, 0, robot_team="blue")
+        #obs.append(Obstacle((-4., 0.5), r=0.5))
+        print(obs[-1])
         blue0 = teams_data["blue"][0]
         blue0_pos = blue0.pos
         cmd = target - blue0_pos
         sol = zeroing_cbf(blue0_pos, cmd, alpha=9, obstacles=obs)
         print(f"Offset : {np.linalg.norm(sol['x'] - matrix(cmd)) ** 2}")
+        print(f"Cmd : {cmd}")
+        print(f"Sol : {np.array(sol['x'])}")
         return {"blue": {0: sol["x"]}}
 
     grSimController.run(
