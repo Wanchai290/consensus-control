@@ -27,13 +27,13 @@ if __name__ == '__main__':
         print("msg received")
         data = json.loads(message)
         rob_pos = data["rob_pos"]
-        obstacles = list(map(lambda obs: Obstacle(xy=np.array(obs), r=0.25), data["obstacles"]))
-        alpha = data["alpha"]
-        v_nom = np.array(data["v_nom"])
-        t_start = time.time()
         try:
             sol = zeroing_cbf(rob_pos, v_nom, alpha, obstacles)
-        except ValueError as e:
+            obstacles = list(map(lambda obs: Obstacle(xy=np.array(obs), r=0.25), data["obstacles"]))
+            alpha = data["alpha"]
+            v_nom = np.array(data["v_nom"])
+            t_start = time.time()
+        except (ValueError, IndexError) as e:
             print(e)
             sol = {'x': v_nom}
         print("Solver compute time : ", (time.time() - t_start) * 1000.)
