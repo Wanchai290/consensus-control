@@ -21,6 +21,12 @@ if __name__ == '__main__':
     socket = context.socket(zmq.REP)
     socket.bind("tcp://*:5555")
 
+    OBS_PENALTY_POSITIVE = [Obstacle(xy=np.array([4., 0.5]), r=0.67), Obstacle(xy=np.array([4., -0.5]), r=0.72)]
+    OBS_PENALTY_NEGATIVE = [Obstacle(xy=np.array([-4., 0.5]), r=0.67), Obstacle(xy=np.array([-4., -0.5]), r=0.72)]
+    
+    # LA CONSTANTE DE LA MORT
+    our_team_on_positive = False
+
     while True:
         print("wait for msg")
         message = socket.recv()
@@ -32,6 +38,10 @@ if __name__ == '__main__':
         try:
             alpha = data["alpha"]
             obstacles = list(map(lambda obs: Obstacle(xy=np.array(obs), r=0.25), data["obstacles"]))
+            if our_team_on_positive:
+                obstacles.extend(OBS_PENALTY_NEGATIVE)
+            else:
+                obstacles.extend(OBS_PENALTY_POSITIVE)
             sol = zeroing_cbf(rob_pos, v_nom, alpha, obstacles)
         except (ValueError, IndexError) as e:
             print(e)
